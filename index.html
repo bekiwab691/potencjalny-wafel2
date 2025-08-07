@@ -60,11 +60,12 @@
       background-color: rgba(255, 255, 255, 0.9);
       color: #000;
       transition: box-shadow 0.3s ease, border-color 0.3s ease;
+      font-family: Arial, sans-serif; /* tutaj Arial w polu */
     }
 
     /* Złota poświata przy focusie */
     input:focus {
-      border-color: #daa520; /* złoty kolor */
+      border-color: #daa520;
       box-shadow: 0 0 10px 3px rgba(218, 165, 32, 0.8);
       background-color: #fff;
     }
@@ -160,8 +161,31 @@
       "Dawid Dudziński": 18
     };
 
+    // Normalizacja: usuwa polskie znaki, zamienia na małe litery
     function normalizeName(str) {
       return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    }
+
+    // Levenshtein distance - do fuzzy search
+    function levenshtein(a, b) {
+      const matrix = [];
+      for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+      for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+
+      for (let i = 1; i <= b.length; i++) {
+        for (let j = 1; j <= a.length; j++) {
+          if (b.charAt(i - 1) === a.charAt(j - 1)) {
+            matrix[i][j] = matrix[i - 1][j - 1];
+          } else {
+            matrix[i][j] = Math.min(
+              matrix[i - 1][j - 1] + 1,
+              matrix[i][j - 1] + 1,
+              matrix[i - 1][j] + 1
+            );
+          }
+        }
+      }
+      return matrix[b.length][a.length];
     }
 
     function findTable() {
@@ -177,18 +201,41 @@
         return;
       }
 
-      let found = false;
+      const inputWords = nameInput.split(/\s+/).filter(Boolean);
+
+      let closestGuest = null;
+      let smallestDistance = Infinity;
+
       for (const [name, table] of Object.entries(guests)) {
         const normalizedName = normalizeName(name);
-        if (normalizedName === nameInput || normalizedName.includes(nameInput)) {
-          showResult(`Witaj, <strong>${name}</strong>! Twój stół to numer <strong>${table}</strong>.<br>
-          <img src="stol.png" alt="Stół" class="table-image">`);
-          found = true;
-          break;
+        const nameWords = normalizedName.split(/\s+/);
+
+        // Sprawdzenie częściowego dopasowania (np. wpisanie samego nazwiska)
+        const partialMatch = inputWords.every(inputWord =>
+          nameWords.some(nameWord => nameWord.includes(inputWord))
+        );
+
+        if (!partialMatch) continue;
+
+        // Oblicz odległość Levenshteina pomiędzy całym tekstem i słowami
+        const minDistanceAmongWords = Math.min(...inputWords.flatMap(iw =>
+          nameWords.map(nw => levenshtein(iw, nw))
+        ));
+        const fullDistance = levenshtein(normalizedName, nameInput);
+        const distance = Math.min(fullDistance, minDistanceAmongWords);
+
+        if (distance < smallestDistance) {
+          smallestDistance = distance;
+          closestGuest = [name, table];
         }
       }
 
-      if (!found) {
+      const maxDistance = 2; // Tolerancja błędów
+
+      if (closestGuest && smallestDistance <= maxDistance) {
+        showResult(`Witaj, <strong>${closestGuest[0]}</strong>! Twój stół to numer <strong>${closestGuest[1]}</strong>.<br>
+          <img src="stol.png" alt="Stół" class="table-image">`);
+      } else {
         showResult(`Nie znaleziono gościa o podanym imieniu i nazwisku.`);
       }
     }
@@ -212,3 +259,4 @@
 
 </body>
 </html>
+
