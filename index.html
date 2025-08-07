@@ -31,17 +31,19 @@
       padding: 50px 20px;
     }
 
+    /* Logo: większe, bardziej obniżone, przezroczyste */
     .logo {
       width: 250px;
-      margin-top: 80px;
+      margin-top: 120px; /* jeszcze bardziej obniżone */
       opacity: 0.7;
     }
 
+    /* Input i button w jednej linii */
     .input-group {
       display: flex;
       justify-content: center;
       align-items: center;
-      margin-top: 40px;
+      margin-top: 10px; /* podniesione bliżej góry */
       width: 100%;
       max-width: 350px;
     }
@@ -50,11 +52,12 @@
       padding: 10px;
       font-size: 16px;
       flex-grow: 1;
-      border: 2px solid #fff;
+      border: 2px solid #fff; /* obramowanie */
       border-radius: 4px 0 0 4px;
       outline: none;
       background-color: rgba(255, 255, 255, 0.9);
       color: #000;
+      margin-bottom: 0; /* bez dodatkowego marginesu */
     }
 
     button {
@@ -77,6 +80,7 @@
       background-color: #666;
     }
 
+    /* Wynik: czarny tekst na jasnym tle */
     #result {
       margin-top: 30px;
       font-size: 20px;
@@ -86,6 +90,7 @@
       padding: 15px 20px;
       border-radius: 8px;
       max-width: 90%;
+      word-wrap: break-word;
     }
 
     .table-image {
@@ -99,9 +104,11 @@
   <!-- Logo -->
   <img src="logo.png" alt="Logo imprezy" class="logo" />
 
+  <!-- Usunięty napis powitalny i instrukcje -->
+
   <!-- Input + przycisk -->
   <div class="input-group">
-    <input type="text" id="guestName" placeholder="Imię i nazwisko" />
+    <input type="text" id="guestName" placeholder="Imię i nazwisko" autocomplete="off" />
     <button onclick="findTable()">🔍</button>
   </div>
 
@@ -118,11 +125,10 @@
       "Mateusz Wunderlich": 12,
       "Joanna Wilińska": 13,
       "Maja Troszczyńska": 14,
-      "Kinga Wilczyńska": 15,
-      "Alicja Szulc": 16
+      "Kinga Wilczyńska": 15
     };
 
-    // Normalizacja do porównań bez polskich znaków
+    // Funkcja usuwająca polskie znaki i zamieniająca na małe litery
     function normalizeName(str) {
       return str
         .normalize("NFD")
@@ -130,7 +136,7 @@
         .toLowerCase();
     }
 
-    // Funkcja licząca odległość Levenshteina
+    // Funkcja licząca odległość Levenshteina (do fuzzy search)
     function levenshtein(a, b) {
       const matrix = [];
 
@@ -147,9 +153,9 @@
             matrix[i][j] = matrix[i - 1][j - 1];
           } else {
             matrix[i][j] = Math.min(
-              matrix[i - 1][j - 1] + 1, // zamiana
-              matrix[i][j - 1] + 1,     // wstawienie
-              matrix[i - 1][j] + 1      // usunięcie
+              matrix[i - 1][j - 1] + 1,
+              matrix[i][j - 1] + 1,
+              matrix[i - 1][j] + 1
             );
           }
         }
@@ -159,17 +165,35 @@
 
     function findTable() {
       const input = document.getElementById('guestName');
-      const nameInput = normalizeName(input.value.trim());
+      const rawInput = input.value.trim();
+      const nameInput = normalizeName(rawInput);
       const resultDiv = document.getElementById('result');
 
-      input.blur(); // Zamknij klawiaturę na telefonie
+      input.blur(); // zamyka klawiaturę na telefonie
+
+      if (!nameInput) {
+        resultDiv.innerHTML = `Proszę wpisać imię i nazwisko.`;
+        return;
+      }
+
+      const inputWords = nameInput.split(/\s+/).filter(Boolean);
 
       let closestGuest = null;
       let smallestDistance = Infinity;
 
       for (const [name, table] of Object.entries(guests)) {
         const normalizedName = normalizeName(name);
-        const distance = levenshtein(normalizedName, nameInput);
+        const nameWords = normalizedName.split(/\s+/);
+
+        // minimalna odległość pomiędzy słowami w input a słowami w imieniu
+        const minDistanceAmongWords = Math.min(...inputWords.flatMap(iw =>
+          nameWords.map(nw => levenshtein(iw, nw))
+        ));
+
+        // odległość pełnego tekstu
+        const fullDistance = levenshtein(normalizedName, nameInput);
+
+        const distance = Math.min(fullDistance, minDistanceAmongWords);
 
         if (distance < smallestDistance) {
           smallestDistance = distance;
@@ -177,7 +201,7 @@
         }
       }
 
-      const maxDistance = 2; // maksymalna tolerancja błędów
+      const maxDistance = 2; // tolerancja błędów
 
       if (closestGuest && smallestDistance <= maxDistance) {
         resultDiv.innerHTML = `Witaj, <strong>${closestGuest[0]}</strong>! Twój stół to numer <strong>${closestGuest[1]}</strong>.<br>
@@ -187,6 +211,7 @@
       }
     }
 
+    // Obsługa naciśnięcia Enter
     document.getElementById("guestName").addEventListener("keypress", function(event) {
       if (event.key === "Enter") {
         findTable();
@@ -195,5 +220,3 @@
   </script>
 </body>
 </html>
-
-
