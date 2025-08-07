@@ -31,19 +31,17 @@
       padding: 50px 20px;
     }
 
-    /* Logo: większe, obniżone, przezroczyste */
     .logo {
       width: 250px;
       margin-top: 80px;
       opacity: 0.7;
     }
 
-    /* Input i button w jednej linii */
     .input-group {
       display: flex;
       justify-content: center;
       align-items: center;
-      margin-top: 10px; /* 👈 podniesione bliżej tekstu nad */
+      margin-top: 10px;
       width: 100%;
       max-width: 350px;
     }
@@ -52,7 +50,7 @@
       padding: 10px;
       font-size: 16px;
       flex-grow: 1;
-      border: 2px solid #fff; /* obramowanie */
+      border: 2px solid #fff;
       border-radius: 4px 0 0 4px;
       outline: none;
       background-color: rgba(255, 255, 255, 0.9);
@@ -79,7 +77,6 @@
       background-color: #666;
     }
 
-    /* Wynik: czarny tekst na jasnym tle */
     #result {
       margin-top: 30px;
       font-size: 20px;
@@ -102,9 +99,6 @@
   <!-- Logo -->
   <img src="logo.png" alt="Logo imprezy" class="logo" />
 
-  <h1>Witaj na imprezie!</h1>
-  <p>Wpisz swoje imię i nazwisko, aby sprawdzić numer stołu:</p>
-
   <!-- Input + przycisk -->
   <div class="input-group">
     <input type="text" id="guestName" placeholder="Imię i nazwisko" />
@@ -123,7 +117,7 @@
       "Piotr Kaczmarek": 4,
       "Mateusz Wunderlich": 12,
       "Joanna Wilińska": 13,
-      ''Maja Troszczyńska'': 14, 
+      "Maja Troszczyńska": 14,
       "Kinga Wilczyńska": 15
     };
 
@@ -135,7 +129,7 @@
       );
       const resultDiv = document.getElementById('result');
 
-      input.blur(); // ✅ Zamyka klawiaturę na telefonie
+      input.blur(); // Zamyka klawiaturę na telefonie
 
       if (guestEntry) {
         resultDiv.innerHTML = `Witaj, <strong>${guestEntry[0]}</strong>! Twój stół to numer <strong>${guestEntry[1]}</strong>.<br>
@@ -145,7 +139,6 @@
       }
     }
 
-    // Obsługa Entera
     document.getElementById("guestName").addEventListener("keypress", function(event) {
       if (event.key === "Enter") {
         findTable();
@@ -154,5 +147,3 @@
   </script>
 </body>
 </html>
-
-
