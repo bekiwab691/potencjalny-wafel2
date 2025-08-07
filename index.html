@@ -4,6 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Przydział do stołów</title>
+
+  <!-- Google Fonts: Poppins -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+
   <style>
     html, body {
       margin: 0;
@@ -14,9 +18,12 @@
     }
 
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Poppins', Arial, sans-serif;
       text-align: center;
-      background-image: url('tlo.jpg');
+      /* Tło + gradientowa nakładka */
+      background: 
+        linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)),
+        url('tlo.jpg');
       background-size: cover;
       background-position: center center;
       background-repeat: no-repeat;
@@ -43,7 +50,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      margin-top: 45px;
+      margin-top: 0px;
       width: 100%;
       max-width: 350px;
       box-sizing: border-box;
@@ -60,6 +67,7 @@
       color: #000;
       margin-bottom: 0;
       transition: box-shadow 0.3s ease, border-color 0.3s ease;
+      font-weight: 400;
     }
 
     input:focus {
@@ -83,6 +91,7 @@
       align-items: center;
       padding: 0;
       transition: background-color 0.3s ease;
+      font-weight: 600;
     }
 
     button:hover, button:focus {
@@ -94,7 +103,7 @@
     #result {
       margin-top: 30px;
       font-size: 22px;
-      font-weight: bold;
+      font-weight: 600;
       color: #000;
       background-color: rgba(255, 255, 255, 0.9);
       padding: 20px 25px;
@@ -176,7 +185,6 @@
       "Dawid Dudziński": 18
     };
 
-    // Usuwa polskie znaki i na małe litery
     function normalizeName(str) {
       return str
         .normalize("NFD")
@@ -184,7 +192,6 @@
         .toLowerCase();
     }
 
-    // Odległość Levenshteina
     function levenshtein(a, b) {
       const matrix = [];
       for (let i = 0; i <= b.length; i++) matrix[i] = [i];
@@ -237,7 +244,7 @@
         const normalizedName = normalizeName(name);
         const nameWords = normalizedName.split(/\s+/);
 
-        // Sprawdzenie częściowego dopasowania (np. „wunderlich” w „mateusz wunderlich”)
+        // Obsługa częściowego dopasowania
         const partialMatch = inputWords.some(iw =>
           nameWords.some(nw => nw.includes(iw))
         );
@@ -273,7 +280,6 @@
 
       resultDiv.classList.add('visible');
 
-      // Automatyczne ukrycie po 8 sekundach
       hideTimeout = setTimeout(() => {
         resultDiv.classList.remove('visible');
         resultDiv.textContent = "";
@@ -288,4 +294,3 @@
   </script>
 </body>
 </html>
-
