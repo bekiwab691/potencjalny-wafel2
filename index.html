@@ -50,8 +50,8 @@
     }
 
     input {
-      padding: 10px;
-      font-size: 16px;
+      padding: 16px 12px;
+      font-size: 18px;
       flex-grow: 1;
       border: 2px solid #fff;
       border-radius: 4px 0 0 4px;
@@ -69,9 +69,9 @@
     }
 
     button {
-      width: 48px;
-      height: 48px;
-      font-size: 20px;
+      width: 56px;
+      height: 56px;
+      font-size: 24px;
       margin-left: 0;
       cursor: pointer;
       border: none;
@@ -82,21 +82,23 @@
       justify-content: center;
       align-items: center;
       padding: 0;
+      transition: background-color 0.3s ease;
     }
 
-    button:hover {
+    button:hover, button:focus {
       background-color: #666;
+      outline: none;
     }
 
     /* Wynik z animacją pojawiania od dołu */
     #result {
       margin-top: 30px;
-      font-size: 20px;
+      font-size: 22px;
       font-weight: bold;
       color: #000;
-      background-color: rgba(255, 255, 255, 0.8);
-      padding: 15px 20px;
-      border-radius: 8px;
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 20px 25px;
+      border-radius: 10px;
       max-width: 90%;
       word-wrap: break-word;
       opacity: 0;
@@ -112,6 +114,34 @@
       width: 100px;
       margin-top: 20px;
     }
+
+    /* Responsywność */
+    @media (max-width: 480px) {
+      body {
+        padding: 30px 15px;
+      }
+      .logo {
+        width: 180px;
+        margin-top: 80px;
+      }
+      input {
+        font-size: 16px;
+        padding: 14px 10px;
+      }
+      button {
+        width: 48px;
+        height: 48px;
+        font-size: 20px;
+      }
+      #result {
+        font-size: 18px;
+        padding: 16px 20px;
+      }
+      .table-image {
+        width: 80px;
+        margin-top: 15px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -119,11 +149,17 @@
   <img src="logo.png" alt="Logo imprezy" class="logo" />
 
   <div class="input-group">
-    <input type="text" id="guestName" placeholder="Imię i nazwisko" autocomplete="off" />
-    <button onclick="findTable()">🔍</button>
+    <input 
+      type="text" 
+      id="guestName" 
+      placeholder="Imię i nazwisko" 
+      autocomplete="off" 
+      aria-label="Wpisz swoje imię i nazwisko"
+    />
+    <button onclick="findTable()" aria-label="Wyszukaj stół">🔍</button>
   </div>
 
-  <div id="result"></div>
+  <div id="result" aria-live="polite"></div>
 
   <script>
     const guests = {
@@ -140,6 +176,7 @@
       "Dawid Dudziński": 18
     };
 
+    // Usuwa polskie znaki i na małe litery
     function normalizeName(str) {
       return str
         .normalize("NFD")
@@ -147,15 +184,11 @@
         .toLowerCase();
     }
 
+    // Odległość Levenshteina
     function levenshtein(a, b) {
       const matrix = [];
-
-      for (let i = 0; i <= b.length; i++) {
-        matrix[i] = [i];
-      }
-      for (let j = 0; j <= a.length; j++) {
-        matrix[0][j] = j;
-      }
+      for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+      for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
 
       for (let i = 1; i <= b.length; i++) {
         for (let j = 1; j <= a.length; j++) {
@@ -173,7 +206,11 @@
       return matrix[b.length][a.length];
     }
 
+    let hideTimeout;
+
     function findTable() {
+      clearTimeout(hideTimeout);
+
       const input = document.getElementById('guestName');
       const rawInput = input.value.trim();
       const nameInput = normalizeName(rawInput);
@@ -182,8 +219,12 @@
       input.blur();
 
       if (!nameInput) {
-        resultDiv.innerHTML = `Proszę wpisać imię i nazwisko.`;
+        resultDiv.textContent = "Proszę wpisać imię i nazwisko.";
         resultDiv.classList.add('visible');
+        hideTimeout = setTimeout(() => {
+          resultDiv.classList.remove('visible');
+          resultDiv.textContent = "";
+        }, 8000);
         return;
       }
 
@@ -196,17 +237,24 @@
         const normalizedName = normalizeName(name);
         const nameWords = normalizedName.split(/\s+/);
 
+        // Sprawdzenie częściowego dopasowania (np. „wunderlich” w „mateusz wunderlich”)
+        const partialMatch = inputWords.some(iw =>
+          nameWords.some(nw => nw.includes(iw))
+        );
+
+        if (partialMatch) {
+          closestGuest = [name, table];
+          smallestDistance = -1;
+          break;
+        }
+
         const minDistanceAmongWords = Math.min(...inputWords.flatMap(iw =>
           nameWords.map(nw => levenshtein(iw, nw))
         ));
 
         const fullDistance = levenshtein(normalizedName, nameInput);
 
-        const partialMatch = inputWords.some(iw =>
-          nameWords.some(nw => nw.includes(iw))
-        );
-
-        let distance = partialMatch ? 0 : Math.min(fullDistance, minDistanceAmongWords);
+        const distance = Math.min(fullDistance, minDistanceAmongWords);
 
         if (distance < smallestDistance) {
           smallestDistance = distance;
@@ -216,13 +264,20 @@
 
       const maxDistance = 2;
 
-      if (closestGuest && smallestDistance <= maxDistance) {
+      if (closestGuest && (smallestDistance <= maxDistance || smallestDistance === -1)) {
         resultDiv.innerHTML = `Witaj, <strong>${closestGuest[0]}</strong>! Twój stół to numer <strong>${closestGuest[1]}</strong>.<br>
-        <img src="stol.png" alt="Stół" class="table-image">`;
+          <img src="stol.png" alt="Stół" class="table-image">`;
       } else {
-        resultDiv.innerHTML = `Nie znaleziono gościa o podanym imieniu i nazwisku.`;
+        resultDiv.textContent = "Nie znaleziono gościa o podanym imieniu i nazwisku.";
       }
+
       resultDiv.classList.add('visible');
+
+      // Automatyczne ukrycie po 8 sekundach
+      hideTimeout = setTimeout(() => {
+        resultDiv.classList.remove('visible');
+        resultDiv.textContent = "";
+      }, 8000);
     }
 
     document.getElementById("guestName").addEventListener("keypress", function(event) {
