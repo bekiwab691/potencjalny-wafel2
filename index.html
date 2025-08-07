@@ -41,7 +41,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      margin-top: 10px;
+      margin-top: 40px;
       width: 100%;
       max-width: 350px;
     }
@@ -121,15 +121,24 @@
       "Kinga Wilczyńska": 15
     };
 
+    // Normalizacja do porównań bez polskich znaków
+    function normalizeName(str) {
+      return str
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+    }
+
     function findTable() {
       const input = document.getElementById('guestName');
-      const nameInput = input.value.trim().toLowerCase();
-      const guestEntry = Object.entries(guests).find(
-        ([name]) => name.toLowerCase() === nameInput
-      );
+      const nameInput = normalizeName(input.value.trim());
       const resultDiv = document.getElementById('result');
 
-      input.blur(); // Zamyka klawiaturę na telefonie
+      input.blur(); // Zamyka klawiaturę
+
+      const guestEntry = Object.entries(guests).find(
+        ([name]) => normalizeName(name) === nameInput
+      );
 
       if (guestEntry) {
         resultDiv.innerHTML = `Witaj, <strong>${guestEntry[0]}</strong>! Twój stół to numer <strong>${guestEntry[1]}</strong>.<br>
