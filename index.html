@@ -2,10 +2,8 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>Przydział do stołów</title>
-  <!-- Google Fonts Poppins -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet" />
   <style>
     html, body {
       margin: 0;
@@ -13,7 +11,7 @@
       height: 100%;
       width: 100%;
       overflow-x: hidden;
-      font-family: 'Poppins', sans-serif;
+      font-family: Arial, sans-serif;
     }
 
     body {
@@ -33,37 +31,34 @@
       padding: 50px 20px;
     }
 
-    /* Logo */
     .logo {
       width: 250px;
       margin-top: 120px;
       opacity: 0.7;
     }
 
-    /* Input i button w jednej linii */
     .input-group {
       display: flex;
       justify-content: center;
       align-items: center;
-      margin-top: 45;
+      margin-top: 0;
       width: 100%;
       max-width: 350px;
     }
 
     input {
       padding: 14px;
-      font-size: 16px;
+      font-size: 16px; /* >=16px by wyłączyć zoom na mobilkach */
       flex-grow: 1;
       border: 2px solid #fff;
       border-radius: 4px 0 0 4px;
       outline: none;
       background-color: rgba(255, 255, 255, 0.9);
       color: #000;
+      font-weight: bold; /* pogrubione */
       transition: box-shadow 0.3s ease, border-color 0.3s ease;
-      font-family: Arial, sans-serif; /* tutaj Arial w polu */
     }
 
-    /* Złota poświata przy focusie */
     input:focus {
       border-color: #daa520;
       box-shadow: 0 0 10px 3px rgba(218, 165, 32, 0.8);
@@ -91,7 +86,6 @@
       background-color: #666;
     }
 
-    /* Wynik */
     #result {
       margin-top: 30px;
       font-size: 20px;
@@ -121,7 +115,7 @@
     @media (max-width: 480px) {
       input {
         padding: 12px;
-        font-size: 14px;
+        font-size: 16px; /* utrzymujemy >=16px */
       }
       button {
         width: 40px;
@@ -161,12 +155,10 @@
       "Dawid Dudziński": 18
     };
 
-    // Normalizacja: usuwa polskie znaki, zamienia na małe litery
     function normalizeName(str) {
       return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
     }
 
-    // Levenshtein distance - do fuzzy search
     function levenshtein(a, b) {
       const matrix = [];
       for (let i = 0; i <= b.length; i++) matrix[i] = [i];
@@ -210,14 +202,13 @@
         const normalizedName = normalizeName(name);
         const nameWords = normalizedName.split(/\s+/);
 
-        // Sprawdzenie częściowego dopasowania (np. wpisanie samego nazwiska)
+        // Częściowe dopasowanie - każdy słowo z input musi pasować do któregoś słowa z nazwy gościa
         const partialMatch = inputWords.every(inputWord =>
           nameWords.some(nameWord => nameWord.includes(inputWord))
         );
 
         if (!partialMatch) continue;
 
-        // Oblicz odległość Levenshteina pomiędzy całym tekstem i słowami
         const minDistanceAmongWords = Math.min(...inputWords.flatMap(iw =>
           nameWords.map(nw => levenshtein(iw, nw))
         ));
@@ -230,7 +221,7 @@
         }
       }
 
-      const maxDistance = 2; // Tolerancja błędów
+      const maxDistance = 2;
 
       if (closestGuest && smallestDistance <= maxDistance) {
         showResult(`Witaj, <strong>${closestGuest[0]}</strong>! Twój stół to numer <strong>${closestGuest[1]}</strong>.<br>
@@ -259,4 +250,3 @@
 
 </body>
 </html>
-
