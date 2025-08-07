@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Przydział do stołów</title>
   <style>
     html, body {
@@ -17,7 +17,7 @@
       font-family: Arial, sans-serif;
       text-align: center;
       background-image: url('tlo.jpg');
-      background-size: cover;           /* ✅ Tło rozciąga się na cały ekran */
+      background-size: cover;
       background-position: center center;
       background-repeat: no-repeat;
       background-attachment: fixed;
@@ -31,29 +31,57 @@
       padding: 50px 20px;
     }
 
+    /* Logo: powiększone, przesunięte w dół, przezroczyste */
+    .logo {
+      width: 250px;       /* powiększone */
+      margin-top: 30px;   /* obniżone */
+      opacity: 0.7;       /* przezroczystość */
+    }
+
+    /* Kontener na input i przycisk obok siebie */
+    .input-group {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 20px;
+      width: 100%;
+      max-width: 350px;
+    }
+
     input {
       padding: 10px;
       font-size: 16px;
-      width: 90%;
-      max-width: 300px;
+      flex-grow: 1;
+      border: none;
+      border-radius: 4px 0 0 4px;
+      outline: none;
+      max-width: 280px;
     }
 
     button {
-      padding: 10px 20px;
+      width: 48px;          /* kwadratowy */
+      height: 48px;
       font-size: 16px;
-      margin-left: 10px;
+      margin-left: 0;
       cursor: pointer;
+      border: none;
+      border-radius: 0 4px 4px 0;
+      background-color: #444;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0;
+    }
+
+    button:hover {
+      background-color: #666;
     }
 
     #result {
       margin-top: 30px;
       font-size: 20px;
       font-weight: bold;
-    }
-
-    .logo {
-      width: 150px;
-      margin-bottom: 20px;
     }
 
     .table-image {
@@ -64,14 +92,17 @@
 </head>
 <body>
 
-  <!-- Logo na górze -->
-  <img src="logo.png" alt="Logo imprezy" class="logo">
+  <!-- Logo -->
+  <img src="logo.png" alt="Logo imprezy" class="logo" />
 
   <h1>Witaj na imprezie!</h1>
   <p>Wpisz swoje imię i nazwisko, aby sprawdzić numer stołu:</p>
 
-  <input type="text" id="guestName" placeholder="Imię i nazwisko" />
-  <button onclick="findTable()">Szukaj</button>
+  <!-- Kontener input + button -->
+  <div class="input-group">
+    <input type="text" id="guestName" placeholder="Imię i nazwisko" />
+    <button onclick="findTable()">🔍</button>
+  </div>
 
   <div id="result"></div>
 
@@ -106,3 +137,5 @@
   </script>
 </body>
 </html>
+
+
