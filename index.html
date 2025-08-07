@@ -118,8 +118,7 @@
       "Mateusz Wunderlich": 12,
       "Joanna Wilińska": 13,
       "Maja Troszczyńska": 14,
-      "Kinga Wilczyńska": 15,
-      "Dawid Dudziński": 16
+      "Kinga Wilczyńska": 15
     };
 
     // Normalizacja do porównań bez polskich znaków
@@ -130,19 +129,57 @@
         .toLowerCase();
     }
 
+    // Funkcja licząca odległość Levenshteina
+    function levenshtein(a, b) {
+      const matrix = [];
+
+      for (let i = 0; i <= b.length; i++) {
+        matrix[i] = [i];
+      }
+      for (let j = 0; j <= a.length; j++) {
+        matrix[0][j] = j;
+      }
+
+      for (let i = 1; i <= b.length; i++) {
+        for (let j = 1; j <= a.length; j++) {
+          if (b.charAt(i - 1) === a.charAt(j - 1)) {
+            matrix[i][j] = matrix[i - 1][j - 1];
+          } else {
+            matrix[i][j] = Math.min(
+              matrix[i - 1][j - 1] + 1, // zamiana
+              matrix[i][j - 1] + 1,     // wstawienie
+              matrix[i - 1][j] + 1      // usunięcie
+            );
+          }
+        }
+      }
+      return matrix[b.length][a.length];
+    }
+
     function findTable() {
       const input = document.getElementById('guestName');
       const nameInput = normalizeName(input.value.trim());
       const resultDiv = document.getElementById('result');
 
-      input.blur(); // Zamyka klawiaturę
+      input.blur(); // Zamknij klawiaturę na telefonie
 
-      const guestEntry = Object.entries(guests).find(
-        ([name]) => normalizeName(name) === nameInput
-      );
+      let closestGuest = null;
+      let smallestDistance = Infinity;
 
-      if (guestEntry) {
-        resultDiv.innerHTML = `Witaj, <strong>${guestEntry[0]}</strong>! Twój stół to numer <strong>${guestEntry[1]}</strong>.<br>
+      for (const [name, table] of Object.entries(guests)) {
+        const normalizedName = normalizeName(name);
+        const distance = levenshtein(normalizedName, nameInput);
+
+        if (distance < smallestDistance) {
+          smallestDistance = distance;
+          closestGuest = [name, table];
+        }
+      }
+
+      const maxDistance = 2; // maksymalna tolerancja błędów
+
+      if (closestGuest && smallestDistance <= maxDistance) {
+        resultDiv.innerHTML = `Witaj, <strong>${closestGuest[0]}</strong>! Twój stół to numer <strong>${closestGuest[1]}</strong>.<br>
         <img src="stol.png" alt="Stół" class="table-image">`;
       } else {
         resultDiv.innerHTML = `Nie znaleziono gościa o podanym imieniu i nazwisku.`;
@@ -157,4 +194,3 @@
   </script>
 </body>
 </html>
-
