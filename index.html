@@ -5,24 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Przydział do stołów</title>
   <style>
-    /* Reset domyślnych marginesów i wymuszenie pełnego rozciągnięcia */
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
       width: 100%;
       overflow-x: hidden;
+      background-color: #000; /* kolor tła za obrazem, gdy nie pokrywa całości */
     }
 
     body {
       font-family: Arial, sans-serif;
       text-align: center;
       background-image: url('tlo.jpg');
-      background-size: cover;             /* Zakrywa całe tło */
+      background-size: contain;          /* ✅ Cały obraz widoczny */
       background-position: center center;
       background-repeat: no-repeat;
       background-attachment: fixed;
-      color: #333;
+      color: #fff;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -107,3 +107,5 @@
   </script>
 </body>
 </html>
+
+
