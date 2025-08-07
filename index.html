@@ -31,19 +31,19 @@
       padding: 50px 20px;
     }
 
-    /* Logo: większy margines, przezroczystość */
+    /* Logo: większe, obniżone, przezroczyste */
     .logo {
       width: 250px;
-      margin-top: 80px;   /* jeszcze bardziej obniżone */
+      margin-top: 80px;
       opacity: 0.7;
     }
 
-    /* Kontener input + button */
+    /* Input i button w jednej linii */
     .input-group {
       display: flex;
       justify-content: center;
       align-items: center;
-      margin-top: 20px;
+      margin-top: 10px; /* 👈 podniesione bliżej tekstu nad */
       width: 100%;
       max-width: 350px;
     }
@@ -52,11 +52,11 @@
       padding: 10px;
       font-size: 16px;
       flex-grow: 1;
-      border: 2px solid #fff; /* ✅ obramowanie białe (lub możesz zmienić) */
+      border: 2px solid #fff; /* obramowanie */
       border-radius: 4px 0 0 4px;
       outline: none;
-      background-color: rgba(255, 255, 255, 0.9); /* lekko przezroczyste tło */
-      color: #000; /* czarny tekst w input */
+      background-color: rgba(255, 255, 255, 0.9);
+      color: #000;
     }
 
     button {
@@ -79,13 +79,13 @@
       background-color: #666;
     }
 
-    /* ✅ Tekst z wynikiem w kolorze czarnym */
+    /* Wynik: czarny tekst na jasnym tle */
     #result {
       margin-top: 30px;
       font-size: 20px;
       font-weight: bold;
       color: #000;
-      background-color: rgba(255, 255, 255, 0.8); /* opcjonalne tło dla lepszej czytelności */
+      background-color: rgba(255, 255, 255, 0.8);
       padding: 15px 20px;
       border-radius: 8px;
       max-width: 90%;
@@ -124,11 +124,15 @@
     };
 
     function findTable() {
-      const nameInput = document.getElementById('guestName').value.trim().toLowerCase();
+      const input = document.getElementById('guestName');
+      const nameInput = input.value.trim().toLowerCase();
       const guestEntry = Object.entries(guests).find(
         ([name]) => name.toLowerCase() === nameInput
       );
       const resultDiv = document.getElementById('result');
+
+      input.blur(); // ✅ Zamyka klawiaturę na telefonie
+
       if (guestEntry) {
         resultDiv.innerHTML = `Witaj, <strong>${guestEntry[0]}</strong>! Twój stół to numer <strong>${guestEntry[1]}</strong>.<br>
         <img src="stol.png" alt="Stół" class="table-image">`;
@@ -137,6 +141,7 @@
       }
     }
 
+    // Obsługa Entera
     document.getElementById("guestName").addEventListener("keypress", function(event) {
       if (event.key === "Enter") {
         findTable();
