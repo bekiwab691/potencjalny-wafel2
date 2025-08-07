@@ -11,14 +11,13 @@
       height: 100%;
       width: 100%;
       overflow-x: hidden;
-      background-color: #000; /* kolor tła za obrazem, gdy nie pokrywa całości */
     }
 
     body {
       font-family: Arial, sans-serif;
       text-align: center;
       background-image: url('tlo.jpg');
-      background-size: contain;          /* ✅ Cały obraz widoczny */
+      background-size: cover;           /* ✅ Tło rozciąga się na cały ekran */
       background-position: center center;
       background-repeat: no-repeat;
       background-attachment: fixed;
@@ -107,5 +106,3 @@
   </script>
 </body>
 </html>
-
-
