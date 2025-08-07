@@ -4,6 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Przydział do stołów</title>
+
+  <!-- Google Fonts Poppins -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+
   <style>
     html, body {
       margin: 0;
@@ -11,31 +15,46 @@
       height: 100%;
       width: 100%;
       overflow-x: hidden;
+      background: url('tlo.jpg') no-repeat center center fixed;
+      background-size: cover;
+      font-family: 'Poppins', Arial, sans-serif;
+      color: #fff;
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
     body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background-image: url('tlo.jpg');
-      background-size: cover;
-      background-position: center center;
-      background-repeat: no-repeat;
-      background-attachment: fixed;
-      color: #fff;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
       min-height: 100vh;
-      box-sizing: border-box;
       padding: 50px 20px;
+      position: relative;
     }
 
-    /* Logo: większe, bardziej obniżone, przezroczyste */
+    /* Subtelna nakładka gradientowa na tło */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35));
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Logo */
     .logo {
       width: 250px;
-      margin-top: 120px; /* jeszcze bardziej obniżone */
+      margin-top: 120px; /* obniżone */
       opacity: 0.7;
+      filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4));
+      transition: transform 0.4s ease;
+      z-index: 1;
+    }
+    .logo:hover {
+      transform: scale(1.05);
     }
 
     /* Input i button w jednej linii */
@@ -43,60 +62,107 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      margin-top: 30px; /* podniesione bliżej góry */
+      margin-top: 0px;
       width: 100%;
       max-width: 350px;
+      z-index: 1;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      border-radius: 8px;
+      overflow: hidden;
+      background-color: rgba(255,255,255,0.95);
     }
 
     input {
-      padding: 10px;
+      padding: 14px 16px;
       font-size: 16px;
       flex-grow: 1;
-      border: 2px solid #fff; /* obramowanie */
-      border-radius: 4px 0 0 4px;
+      border: none;
       outline: none;
-      background-color: rgba(255, 255, 255, 0.9);
+      background-color: transparent;
       color: #000;
-      margin-bottom: 0; /* bez dodatkowego marginesu */
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      transition: box-shadow 0.3s ease;
+    }
+    input::placeholder {
+      color: #777;
+      font-weight: 400;
+    }
+    input:focus {
+      box-shadow: inset 0 0 6px #00aaff;
     }
 
     button {
       width: 48px;
       height: 48px;
-      font-size: 20px;
-      margin-left: 0;
+      font-size: 22px;
       cursor: pointer;
       border: none;
-      border-radius: 0 4px 4px 0;
       background-color: #444;
       color: #fff;
       display: flex;
       justify-content: center;
       align-items: center;
       padding: 0;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    button:hover, button:focus {
+      background-color: #00aaff;
+      box-shadow: 0 4px 12px rgba(0,170,255,0.6);
+      outline: none;
     }
 
-    button:hover {
-      background-color: #666;
-    }
-
-    /* Wynik: czarny tekst na jasnym tle */
+    /* Wynik */
     #result {
       margin-top: 30px;
       font-size: 20px;
-      font-weight: bold;
+      font-weight: 700;
       color: #000;
-      background-color: rgba(255, 255, 255, 0.8);
-      padding: 15px 20px;
-      border-radius: 8px;
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 18px 24px;
+      border-radius: 10px;
       max-width: 90%;
       word-wrap: break-word;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+      user-select: none;
+      z-index: 1;
+    }
+    #result.visible {
+      opacity: 1;
+      transform: translateY(0);
     }
 
     .table-image {
       width: 100px;
       margin-top: 20px;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.2));
+      user-select: none;
     }
+
+    /* Responsywność */
+    @media (max-width: 480px) {
+      button {
+        width: 56px;
+        height: 56px;
+        font-size: 26px;
+      }
+      input {
+        font-size: 18px;
+        padding: 16px 18px;
+      }
+      .logo {
+        width: 180px;
+        margin-top: 90px;
+      }
+      #result {
+        font-size: 18px;
+        padding: 16px 20px;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -104,16 +170,14 @@
   <!-- Logo -->
   <img src="logo.png" alt="Logo imprezy" class="logo" />
 
-  <!-- Usunięty napis powitalny i instrukcje -->
-
   <!-- Input + przycisk -->
   <div class="input-group">
     <input type="text" id="guestName" placeholder="Imię i nazwisko" autocomplete="off" />
-    <button onclick="findTable()">🔍</button>
+    <button aria-label="Szukaj" onclick="findTable()">🔍</button>
   </div>
 
   <!-- Wynik -->
-  <div id="result"></div>
+  <div id="result" aria-live="polite" aria-atomic="true"></div>
 
   <script>
     const guests = {
@@ -130,7 +194,7 @@
       "Dawid Dudziński": 18
     };
 
-    // Funkcja usuwająca polskie znaki i zamieniająca na małe litery
+    // Usuwa polskie znaki, zamienia na małe litery
     function normalizeName(str) {
       return str
         .normalize("NFD")
@@ -138,7 +202,7 @@
         .toLowerCase();
     }
 
-    // Funkcja licząca odległość Levenshteina (do fuzzy search)
+    // Levenshtein - odległość edycyjna do fuzzy search
     function levenshtein(a, b) {
       const matrix = [];
 
@@ -175,6 +239,7 @@
 
       if (!nameInput) {
         resultDiv.innerHTML = `Proszę wpisać imię i nazwisko.`;
+        resultDiv.classList.add('visible');
         return;
       }
 
@@ -187,15 +252,21 @@
         const normalizedName = normalizeName(name);
         const nameWords = normalizedName.split(/\s+/);
 
-        // minimalna odległość pomiędzy słowami w input a słowami w imieniu
+        // Odległość między słowami z inputu i z bazy
         const minDistanceAmongWords = Math.min(...inputWords.flatMap(iw =>
           nameWords.map(nw => levenshtein(iw, nw))
         ));
 
-        // odległość pełnego tekstu
+        // Odległość pełnej frazy
         const fullDistance = levenshtein(normalizedName, nameInput);
 
-        const distance = Math.min(fullDistance, minDistanceAmongWords);
+        // Dodatkowo, sprawdzamy czy którykolwiek wyraz z imienia/nazwiska jest zawarty w input (np. wpisanie tylko "wunderlich")
+        const partialMatch = inputWords.some(iw =>
+          nameWords.some(nw => nw.includes(iw))
+        );
+
+        // Przyjmujemy minimalną odległość lub 0 jeśli partialMatch jest true (dokładny match słowa)
+        let distance = partialMatch ? 0 : Math.min(fullDistance, minDistanceAmongWords);
 
         if (distance < smallestDistance) {
           smallestDistance = distance;
@@ -211,9 +282,16 @@
       } else {
         resultDiv.innerHTML = `Nie znaleziono gościa o podanym imieniu i nazwisku.`;
       }
+      resultDiv.classList.add('visible');
+
+      // Automatyczne wyczyszczenie wyniku po 8 sekundach
+      setTimeout(() => {
+        resultDiv.classList.remove('visible');
+        resultDiv.innerHTML = '';
+      }, 8000);
     }
 
-    // Obsługa naciśnięcia Enter
+    // Obsługa Entera
     document.getElementById("guestName").addEventListener("keypress", function(event) {
       if (event.key === "Enter") {
         findTable();
@@ -222,6 +300,3 @@
   </script>
 </body>
 </html>
-
-
-
