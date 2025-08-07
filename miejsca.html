@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Przydział do stołów</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 50px;
+      background-image: url('tlo.jpg'); /* <-- Tło strony */
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      color: #333;
+    }
+    input {
+      padding: 10px;
+      font-size: 16px;
+      width: 300px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-left: 10px;
+      cursor: pointer;
+    }
+    #result {
+      margin-top: 30px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+    .logo {
+      width: 150px;
+      margin-bottom: 20px;
+    }
+    .table-image {
+      width: 100px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Logo na górze -->
+  <img src="logo.png" alt="Logo imprezy" class="logo">
+
+  <h1>Witaj na imprezie!</h1>
+  <p>Wpisz swoje imię i nazwisko, aby sprawdzić numer stołu:</p>
+
+  <input type="text" id="guestName" placeholder="Imię i nazwisko" />
+  <button onclick="findTable()">Szukaj</button>
+
+  <div id="result"></div>
+
+  <script>
+    const guests = {
+      "Jan Kowalski": 3,
+      "Anna Nowak": 5,
+      "Marek Wiśniewski": 1,
+      "Katarzyna Zielińska": 2,
+      "Piotr Kaczmarek": 4
+    };
+
+    function findTable() {
+      const nameInput = document.getElementById('guestName').value.trim().toLowerCase();
+      const guestEntry = Object.entries(guests).find(
+        ([name]) => name.toLowerCase() === nameInput
+      );
+      const resultDiv = document.getElementById('result');
+      if (guestEntry) {
+        resultDiv.innerHTML = `Witaj, <strong>${guestEntry[0]}</strong>! Twój stół to numer <strong>${guestEntry[1]}</strong>.<br>
+        <img src="stol.png" alt="Stół" class="table-image">`;
+      } else {
+        resultDiv.innerHTML = `Nie znaleziono gościa o podanym imieniu i nazwisku.`;
+      }
+    }
+
+    document.getElementById("guestName").addEventListener("keypress", function(event) {
+      if (event.key === "Enter") {
+        findTable();
+      }
+    });
+  </script>
+</body>
+</html>
