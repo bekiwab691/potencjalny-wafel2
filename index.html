@@ -2,31 +2,41 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Przydział do stołów</title>
   <style>
+    /* Reset domyślnych marginesów i wymuszenie pełnego rozciągnięcia */
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
+      width: 100%;
+      overflow-x: hidden;
     }
 
     body {
       font-family: Arial, sans-serif;
       text-align: center;
-      padding: 50px;
       background-image: url('tlo.jpg');
-      background-size: contain;
-      background-position: center;
+      background-size: cover;             /* Zakrywa całe tło */
+      background-position: center center;
       background-repeat: no-repeat;
       background-attachment: fixed;
-      min-height: 100vh;
       color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      box-sizing: border-box;
+      padding: 50px 20px;
     }
 
     input {
       padding: 10px;
       font-size: 16px;
-      width: 300px;
+      width: 90%;
+      max-width: 300px;
     }
 
     button {
@@ -97,8 +107,3 @@
   </script>
 </body>
 </html>
-
-
-
-
-
