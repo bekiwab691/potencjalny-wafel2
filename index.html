@@ -4,10 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Przydział do stołów</title>
-
-  <!-- Google Fonts: Poppins -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
-
+  <!-- Google Fonts Poppins -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet" />
   <style>
     html, body {
       margin: 0;
@@ -15,15 +13,12 @@
       height: 100%;
       width: 100%;
       overflow-x: hidden;
+      font-family: 'Poppins', sans-serif;
     }
 
     body {
-      font-family: 'Poppins', Arial, sans-serif;
       text-align: center;
-      /* Tło + gradientowa nakładka */
-      background: 
-        linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)),
-        url('tlo.jpg');
+      background-image: url('tlo.jpg');
       background-size: cover;
       background-position: center center;
       background-repeat: no-repeat;
@@ -45,41 +40,39 @@
       opacity: 0.7;
     }
 
-    /* Input i button */
+    /* Input i button w jednej linii */
     .input-group {
       display: flex;
       justify-content: center;
       align-items: center;
-      margin-top: 0px;
+      margin-top: 0;
       width: 100%;
       max-width: 350px;
-      box-sizing: border-box;
     }
 
     input {
-      padding: 16px 12px;
-      font-size: 18px;
+      padding: 14px;
+      font-size: 16px;
       flex-grow: 1;
       border: 2px solid #fff;
       border-radius: 4px 0 0 4px;
       outline: none;
       background-color: rgba(255, 255, 255, 0.9);
       color: #000;
-      margin-bottom: 0;
       transition: box-shadow 0.3s ease, border-color 0.3s ease;
-      font-weight: 400;
     }
 
+    /* Złota poświata przy focusie */
     input:focus {
-      border-color: #00aaff;
-      box-shadow: 0 0 8px #00aaff;
+      border-color: #daa520; /* złoty kolor */
+      box-shadow: 0 0 10px 3px rgba(218, 165, 32, 0.8);
       background-color: #fff;
     }
 
     button {
-      width: 56px;
-      height: 56px;
-      font-size: 24px;
+      width: 48px;
+      height: 48px;
+      font-size: 20px;
       margin-left: 0;
       cursor: pointer;
       border: none;
@@ -91,30 +84,30 @@
       align-items: center;
       padding: 0;
       transition: background-color 0.3s ease;
-      font-weight: 600;
     }
 
-    button:hover, button:focus {
+    button:hover {
       background-color: #666;
-      outline: none;
     }
 
-    /* Wynik z animacją pojawiania od dołu */
+    /* Wynik */
     #result {
       margin-top: 30px;
-      font-size: 22px;
-      font-weight: 600;
+      font-size: 20px;
+      font-weight: bold;
       color: #000;
-      background-color: rgba(255, 255, 255, 0.9);
-      padding: 20px 25px;
-      border-radius: 10px;
+      background-color: rgba(255, 255, 255, 0.8);
+      padding: 15px 20px;
+      border-radius: 8px;
       max-width: 90%;
       word-wrap: break-word;
       opacity: 0;
-      transform: translateY(20px);
-      transition: opacity 0.4s ease, transform 0.4s ease;
+      transform: translateY(10px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+      position: relative;
     }
-    #result.visible {
+
+    #result.show {
       opacity: 1;
       transform: translateY(0);
     }
@@ -124,31 +117,19 @@
       margin-top: 20px;
     }
 
-    /* Responsywność */
     @media (max-width: 480px) {
-      body {
-        padding: 30px 15px;
+      input {
+        padding: 12px;
+        font-size: 14px;
+      }
+      button {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
       }
       .logo {
         width: 180px;
         margin-top: 80px;
-      }
-      input {
-        font-size: 16px;
-        padding: 14px 10px;
-      }
-      button {
-        width: 48px;
-        height: 48px;
-        font-size: 20px;
-      }
-      #result {
-        font-size: 18px;
-        padding: 16px 20px;
-      }
-      .table-image {
-        width: 80px;
-        margin-top: 15px;
       }
     }
   </style>
@@ -158,17 +139,11 @@
   <img src="logo.png" alt="Logo imprezy" class="logo" />
 
   <div class="input-group">
-    <input 
-      type="text" 
-      id="guestName" 
-      placeholder="Imię i nazwisko" 
-      autocomplete="off" 
-      aria-label="Wpisz swoje imię i nazwisko"
-    />
-    <button onclick="findTable()" aria-label="Wyszukaj stół">🔍</button>
+    <input type="text" id="guestName" placeholder="Imię i nazwisko" autocomplete="off" aria-label="Wpisz imię i nazwisko" />
+    <button onclick="findTable()" aria-label="Szukaj">🔍</button>
   </div>
 
-  <div id="result" aria-live="polite"></div>
+  <div id="result" aria-live="polite" role="alert"></div>
 
   <script>
     const guests = {
@@ -186,38 +161,10 @@
     };
 
     function normalizeName(str) {
-      return str
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .toLowerCase();
+      return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
     }
-
-    function levenshtein(a, b) {
-      const matrix = [];
-      for (let i = 0; i <= b.length; i++) matrix[i] = [i];
-      for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
-
-      for (let i = 1; i <= b.length; i++) {
-        for (let j = 1; j <= a.length; j++) {
-          if (b.charAt(i - 1) === a.charAt(j - 1)) {
-            matrix[i][j] = matrix[i - 1][j - 1];
-          } else {
-            matrix[i][j] = Math.min(
-              matrix[i - 1][j - 1] + 1,
-              matrix[i][j - 1] + 1,
-              matrix[i - 1][j] + 1
-            );
-          }
-        }
-      }
-      return matrix[b.length][a.length];
-    }
-
-    let hideTimeout;
 
     function findTable() {
-      clearTimeout(hideTimeout);
-
       const input = document.getElementById('guestName');
       const rawInput = input.value.trim();
       const nameInput = normalizeName(rawInput);
@@ -226,63 +173,33 @@
       input.blur();
 
       if (!nameInput) {
-        resultDiv.textContent = "Proszę wpisać imię i nazwisko.";
-        resultDiv.classList.add('visible');
-        hideTimeout = setTimeout(() => {
-          resultDiv.classList.remove('visible');
-          resultDiv.textContent = "";
-        }, 8000);
+        showResult(`Proszę wpisać imię i nazwisko.`);
         return;
       }
 
-      const inputWords = nameInput.split(/\s+/).filter(Boolean);
-
-      let closestGuest = null;
-      let smallestDistance = Infinity;
-
+      let found = false;
       for (const [name, table] of Object.entries(guests)) {
         const normalizedName = normalizeName(name);
-        const nameWords = normalizedName.split(/\s+/);
-
-        // Obsługa częściowego dopasowania
-        const partialMatch = inputWords.some(iw =>
-          nameWords.some(nw => nw.includes(iw))
-        );
-
-        if (partialMatch) {
-          closestGuest = [name, table];
-          smallestDistance = -1;
+        if (normalizedName === nameInput || normalizedName.includes(nameInput)) {
+          showResult(`Witaj, <strong>${name}</strong>! Twój stół to numer <strong>${table}</strong>.<br>
+          <img src="stol.png" alt="Stół" class="table-image">`);
+          found = true;
           break;
         }
-
-        const minDistanceAmongWords = Math.min(...inputWords.flatMap(iw =>
-          nameWords.map(nw => levenshtein(iw, nw))
-        ));
-
-        const fullDistance = levenshtein(normalizedName, nameInput);
-
-        const distance = Math.min(fullDistance, minDistanceAmongWords);
-
-        if (distance < smallestDistance) {
-          smallestDistance = distance;
-          closestGuest = [name, table];
-        }
       }
 
-      const maxDistance = 2;
-
-      if (closestGuest && (smallestDistance <= maxDistance || smallestDistance === -1)) {
-        resultDiv.innerHTML = `Witaj, <strong>${closestGuest[0]}</strong>! Twój stół to numer <strong>${closestGuest[1]}</strong>.<br>
-          <img src="stol.png" alt="Stół" class="table-image">`;
-      } else {
-        resultDiv.textContent = "Nie znaleziono gościa o podanym imieniu i nazwisku.";
+      if (!found) {
+        showResult(`Nie znaleziono gościa o podanym imieniu i nazwisku.`);
       }
+    }
 
-      resultDiv.classList.add('visible');
+    function showResult(html) {
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = html;
+      resultDiv.classList.add('show');
 
-      hideTimeout = setTimeout(() => {
-        resultDiv.classList.remove('visible');
-        resultDiv.textContent = "";
+      setTimeout(() => {
+        resultDiv.classList.remove('show');
       }, 8000);
     }
 
@@ -292,5 +209,6 @@
       }
     });
   </script>
+
 </body>
 </html>
